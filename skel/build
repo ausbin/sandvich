@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# who said one-liners were only for perl?
+dest=$(env python2 -c 'print __import__("yaml").load(open("config.yml").read())["dest"] or ""')
+ 
+exitstatus=$?
+
+if [ $exitstatus -gt "0" ]; then
+    echo "script error: could not parse config to find dest. see error above." >&2
+    exit 1
+fi
+
+if [ -z $dest ]; then
+    echo "script error: oops! dest in config.yml is empty or None!" >&2
+    exit 1
+fi
+
+rm -rf $dest/* &> /dev/null
+
+exec sandvich build $*
