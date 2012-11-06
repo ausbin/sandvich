@@ -15,13 +15,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-# XXX replace with dict.update()
-# merge two dictionaries. If any conflicts occur, master wins
-def merge (master, secondary) :
-    result = dict(master)
+class SandvichError (Exception) :
+    desc = "general"
+    exitcode = 1
 
-    for key in secondary :
-        if key not in master : 
-            result[key] = secondary[key]
+class ArgError (SandvichError) :
+    desc = "argument"
+    exitcode = 2
 
-    return result
+class DataPoolError (SandvichError) :
+    desc = "data pool/config"
+    exitcode = 3

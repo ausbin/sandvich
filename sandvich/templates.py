@@ -46,7 +46,7 @@ import re
 #  { muffin : color # 3 . getalpha }
 # 
 # all this value retrieval is great, but if we want some logic we use a pipe. if the value before the pipe
-# is empty, the second value is inserted istead. you can stack these for some uber-1337 templates. example:
+# is empty, the second value is inserted instead. you can stack these for some uber-1337 templates. example:
 #  { muffin : color # 3 . getalpha | defaults : alpha  }
 #
 # another example:
@@ -66,7 +66,6 @@ def valsub (match, data) :
     parent = data
 
     for i, token in enumerate(splat) :
-        print mode, "d" if parent == data else parent, token
         # if it's an operator
         if i % 2 :
             if token == ":" :
@@ -81,7 +80,6 @@ def valsub (match, data) :
                 else :
                     mode = "getitem"
                     parent = data
-
         else :
             if not parent :
                 continue
@@ -110,9 +108,6 @@ def valsub (match, data) :
             parent = val
 
     result = str(parent) if parent else ""
-
-    print "done: "+result
-    print
 
     return result
 
