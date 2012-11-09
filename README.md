@@ -6,7 +6,7 @@ sandvich is a simple, extensible document generator based on a pool of data and 
 config
 ------
 
-As mentioned above, sandvich is based around a data pool. In the default interface this is initialized by a yaml file named `config.yml`. If you're not familiar with YAML, it might be helpful to familiarize yourself with it via [its website](http://yaml.org/) or the [wikipedia article](https://en.wikipedia.org/wiki/Yaml).
+As mentioned above, sandvich is based around a data pool. In the default interface this is initialized by a yaml file named `config.yml`. If you're not familiar with yaml, it might be helpful to familiarize yourself with it via [its website](http://yaml.org/) or the [wikipedia article](https://en.wikipedia.org/wiki/Yaml).
 
 Here's an example config file:
 
@@ -52,7 +52,7 @@ pigfoods:
 - pork rinds
 ```
 
-By the third `final` hook, the data pool initialized by the above configuration would like this python snippet:
+By the `final` hook, the data pool initialized by the above configuration would resemble this python dictionary:
 
 ```python
 {
