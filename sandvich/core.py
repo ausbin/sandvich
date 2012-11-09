@@ -20,18 +20,19 @@ from templates import process
 
 # XXX improve error handling for bad config
 
-# default values for the data pool
 defaults = {
-    "src" : "src",
-    "ext" : "",
-    "dest" : "dest",
+    # sane data pool defaults
+    "src" : "src"+os.sep,
+    "dest" : "dest"+os.sep,
     "newext" : ".html",
-    "templatedir" : "templates",
-    "templateext" : ".html",
-    "template" : { "name" : "template" },
-    "hooksdir" : None,
+    "template" : { "location" : "template.html" },
     "hookobjects" : [],
     "pages" : [],
+
+    # empty values to keep string concats from failing
+    "ext" : "",
+    "templatedir" : "",
+    "templateext" : "",
 }
 
 def firehook (d, name) :
@@ -58,7 +59,7 @@ def build (d = {}) :
 
     if "content" not in d["template"] :
         if "location" not in d["template"] :
-            path = os.path.join(d["templatedir"], d["template"]["name"]+d["templateext"])
+            path = d["templatedir"]+d["template"]["name"]+d["templateext"]
             d["template"]["location"] = path
 
         d["template"]["content"] = open(d["template"]["location"]).read()
@@ -72,7 +73,7 @@ def build (d = {}) :
 
         if "content" not in d["page"] :
             if "location" not in d["page"] :
-                d["page"]["location"]  = os.path.join(d["src"], d["page"]["name"]+d["ext"])
+                d["page"]["location"]  = d["src"]+d["page"]["name"]+d["ext"]
 
             d["page"]["content"] = open(d["page"]["location"]).read()
 
@@ -90,9 +91,11 @@ def build (d = {}) :
         # HOOK: postmerge
         d = firehook(d, "postmerge")
 
-        path = os.path.join(d["dest"], d["page"]["name"]+d["newext"])
+        if "destination" not in d["page"] :
+            d["page"]["destination"]  = d["dest"]+d["page"]["name"]+d["newext"]
+
         # write the finished page to its destination
-        open(path, "w").write(d["page"]["content"])
+        open(d["page"]["destination"], "w").write(d["page"]["content"])
 
         # HOOK: postpage 
         d = firehook(d, "postpage")
