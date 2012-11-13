@@ -75,6 +75,10 @@ def valsub (match, data) :
             elif token == "." :
                 mode = "getattr"
             elif token == "|" :
+                # call the parent value if it's callable
+                if callable(parent) :
+                    parent = parent()
+
                 if parent :
                     break
                 else :
@@ -100,12 +104,12 @@ def valsub (match, data) :
                     val = getattr(parent, token)
                 except AttributeError :
                     val = None
-                else :
-                    if callable(val) :
-                        # XXX should we be catching errors here? probably not
-                        val = val()
+
 
             parent = val
+
+    if callable(parent) :
+        parent = parent()
 
     result = str(parent) if parent else ""
 
