@@ -17,43 +17,6 @@
 
 import re
 
-# syntax for templates (simple yet effective!):
-#
-# to insert a value into the document use brackets containing the name of the value. for a value named "muffin":
-#  { muffin }
-#
-# that will convert the value of "muffin" into a string and insert it into the html verbatim (no escaping). 
-#
-# if "muffin" is a dictionary and we want to insert the value of the "color" key:
-#  { muffin : color }
-#
-# in essence, the colon is your path to __getitem__!
-#
-# however, if you try to access a member of a list with the colon, it won't work because you can't access
-# list items with strings containing digits. solution? the pound (#).
-#  { muffin # 0 }
-# 
-# pound works the same as the colon except that it converts what follows it to a int. you can use it with
-# a dict too if you're accessing an item with a key that is an integer. 
-#
-# if "muffin['color']" is a list and we want whatever is at the third indice:
-#  { muffin : color # 3 }
-# 
-# if we want to get a property of one of the items, use a dot:
-#  { muffin : color # 3 . alpha }
-# 
-# if the property is callable, whatever it returns will be placed in the document instead of itself:
-#  { muffin : color # 3 . getalpha }
-# 
-# all this value retrieval is great, but if we want some logic we use a pipe. if the value before the pipe
-# is empty, the second value is inserted instead. you can stack these for some uber-1337 templates. example:
-#  { muffin : color # 3 . getalpha | defaults : alpha  }
-#
-# another example:
-#  <div class="muffins">
-#     <a href="google.com/muffin/color/{muffin:color|defaults:color}">click</a>
-#  </div>
-
 valref = r"\s*(\w+(\s*[:\.#]\s*\w+)*)\s*"
 valregex = re.compile(r"\{(%(v)s(\s*\|%(v)s)*)\}" % {"v" : valref})
 splitregex = re.compile(r"(\w+|[\|\.:#])")

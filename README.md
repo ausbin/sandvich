@@ -1,3 +1,5 @@
+![picture of a sandvich](http://wiki.teamfortress.com/w/images/thumb/9/95/Sandvich.png/100px-Sandvich.png)
+
 sandvich
 ========
 
@@ -163,20 +165,21 @@ templates
 
 sandvich's template processor is extremely simple. It inserts values. If you're looking for more complex logic, try using hooks.
 
-The most basic value is `{ arandomvalue }`. Using the configuration example above this would end up as `8093`. 
+The most basic value substitution is `{ arandomvalue }`. Using the configuration example above this would end up as `8093`. 
 
-If you'd like to seek a value in a dictionary, you can use the `:` operator: `{ fruitcolors : banana }` results in `yellow`. `:` calls __getitem__ with the string you specified, so the last example would result in a call that looks like `d.__getitem__("fruitcolors").__getitem__("banana")` (`d` is the internal variable name for the data pool).
+If you'd like to seek a value in a dictionary, you can use the `:` operator: `{ fruitcolors : banana }` results in `yellow`. `:` calls `__getitem__` with the string you specified, so the last example would result in a call that looks like `d.__getitem__("fruitcolors").__getitem__("banana")` (`d` is the internal variable name for the data pool).
 
-Trying to access an item in a list with the `:` operator will result in a blank value. Why? Because the parameter to `__getitem__()` is a string! The solution is the `#` operator, which converts the value name to an integer before calling `__getitem__()`.    
+Trying to access an item in a list with the `:` operator will raise a `TypeError`. Why? Because the parameter to `__getitem__()` is a string! The solution is the `#` operator, which converts the value name to an integer before calling `__getitem__()`.
+
 For example, `{ pigfoods # 0 }` results in `bacon`. The cool part is that you can use other values such as `-1` because they're integers too. `{ pigfoods # -1 }` would end up as `pork rinds`.
 
 Attributes can be accessed with the `.` operator. `{ hookobjects # 1 . exampleattribute }` would become the value of `example.Example().exampleattribute`.  
 
-If the last value in a chain of values is `callable()`, it will be replaced with its return value. 
+If the last value in a chain of values is `callable()`, it will be replaced with its return value. That means that before every `|` or `}` the current value will be called if it's callable. `{ hookobjects # 1 . examplemethod }` would result in the return value of `example.Example().examplemethod()`.
 
-If the final value is deemed `False` by `bool()` or accessing it raises an error, then it will be inserted into the template as an empty string.
+The `|` operator can be used for basic logic. If the preceding value chain results in a value that is determined to be False by `bool()`, the next chain of values will be evaluated. For example, `{ fruitcolors : donkey | arandomvalue }` would result in `8093`. `fruitcolors["donkey"]` doesn't exist, so that value chain ends up evaluating to `False`, causing the value of `arandomvalue` will be inserted instead. 
 
-The `|` operator can be used for basic logic. If the preceding value chain results in a value that is determined to be False by `bool()`, the next chain of values will be evaluated. For example, `{ fruitcolors : donkey | arandomvalue }` would result in `8093`. `fruitcolors["donkey"]` doesn't exist, so that value chain ends up as `None`. Since that value chain ended up evaluating to `False`, the value of `arandomvalue` will be inserted instead. 
+If the final value is deemed `False` by `bool()` or accessing it raises an error, then it won't be inserted into the template. `that's the { bogus }th fish in my basement this week!`, for example, would end up as `that's the th fish in my basement this week!`.
 
 hooks
 -----
@@ -216,14 +219,16 @@ class Example (Hook) :
         return d
 ```
 
-If you're using the command line interface, list the names of the hook classes in `config.yml` in the order in which you would like them to be executed. If their module are not located in `sys.path`, add their location to `hooksdir`.
+For more a list of keys in the data pool, look at the [config section](#config).
+
+If you're using the command line interface, list the names of the hook classes in `config.yml` in the order in which you would like them to be executed. If their module are not located in `sys.path`, add their location to `hooksdir`. We'll assume that the above python code is located in `./hooks/mycustommodule.py`:
 
 ```yaml
-hooksdir: customhooks
+hooksdir: hooks
 
 hooks:
 - sandvich.hooks.JustPretendThisExists
-- mycustommodule.Escape
+- mycustommodule.Example
 ```
 
 Those will be found and initialized by `__main__.inithooks()` and put into `d["hookobjects"]` like so:
@@ -234,11 +239,11 @@ Those will be found and initialized by `__main__.inithooks()` and put into `d["h
     "hooksdir" : "customhooks",
     "hooks" : [
         "sandvich.hooks.JustPretendThisExists",
-        "mycustommodule.Escape",
+        "mycustommodule.Example",
     ],
     "hookobjects" : [
         sandvich.hooks.JustPretendThisExists(),
-        mycustommodule.Escape()
+        mycustommodule.Example()
     ],
     # ...
 }
