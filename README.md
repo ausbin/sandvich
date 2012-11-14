@@ -16,7 +16,7 @@ installation
     # python2 setup.py install
     # install -Dm 755 bin/sandvich /usr/bin
 
-If use Arch, download the [PKGBUILD](https://raw.github.com/UncleNinja/sandvich/master/PKGBUILD.py) and run `makepkg` to generate an Arch package.
+If use Arch, download the [PKGBUILD](https://raw.github.com/UncleNinja/sandvich/master/PKGBUILD.py) and run `makepkg`.
 
 config
 ------
