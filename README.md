@@ -5,6 +5,19 @@ sandvich
 
 sandvich is a simple, extensible document generator based on a pool of data and a basic template processor.
 
+    $ sandvich help
+    usage: sandvich build [location]
+
+installation
+------------
+
+    $ git clone git://github.com/UncleNinja/sandvich.git sandvich
+    $ cd sandvich
+    # python2 setup.py install
+    # install -Dm 755 bin/sandvich /usr/bin
+
+If use Arch, download the [PKGBUILD](https://raw.github.com/UncleNinja/sandvich/master/PKGBUILD.py) and run `makepkg` to generate an Arch package.
+
 config
 ------
 
