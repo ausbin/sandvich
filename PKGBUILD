@@ -27,17 +27,10 @@ build() {
   fi
 
   msg "GIT checkout done or server timeout"
-  msg "Starting build..."
-
-  rm -rf "$srcdir/$_gitname-build"
-  git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
-  cd "$srcdir/$_gitname-build"
-
-  # no building to do! :D
 }
 
 package() {
-  cd "$srcdir/$_gitname-build"
+  cd "$srcdir/$_gitname"
 
   python2 setup.py install --root="$pkgdir/" --optimize=1
   install -Dm 755 bin/sandvich $pkgdir/usr/bin/sandvich
