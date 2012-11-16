@@ -11,12 +11,14 @@ sandvich is a simple, extensible document generator based on a pool of data and 
 installation
 ------------
 
+Dependencies: a recent version of [Python 2](http://www.python.org/) and [PyYAML](http://pyyaml.org/wiki/PyYAML) (for the default command-line interface).
+
     $ git clone git://github.com/UncleNinja/sandvich.git sandvich
     $ cd sandvich
     # python2 setup.py install
     # install -Dm 755 bin/sandvich /usr/bin
 
-If use Arch, download the [PKGBUILD](https://raw.github.com/UncleNinja/sandvich/master/PKGBUILD.py) and run `makepkg`.
+If use Arch, download the [PKGBUILD](https://raw.github.com/UncleNinja/sandvich/master/PKGBUILD) and run `makepkg`.
 
 config
 ------
