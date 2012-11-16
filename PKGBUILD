@@ -1,13 +1,14 @@
 # Maintainer: Austin Adams <screamingmoron@gmail.com>
 pkgname=python2-sandvich-git
 pkgver=VERSION
-pkgrel=1
+pkgrel=3
 pkgdesc="brutally simple document generation"
 arch=("any")
 url="https://github.com/UncleNinja/sandvich"
 license=('GPL')
-depends=("python2" "python2-yaml")
+depends=("python2")
 makedepends=('git')
+optdepends=("python2-yaml: for the command-line interface")
 provides=("python2-sandvich")
 options=(!emptydirs)
 
