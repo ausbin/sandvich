@@ -18,7 +18,7 @@ Dependencies: a recent version of [Python 2](http://www.python.org/) and [PyYAML
     # python2 setup.py install
     # install -Dm 755 bin/sandvich /usr/bin
 
-If use Arch, download the [PKGBUILD](https://raw.github.com/UncleNinja/sandvich/master/PKGBUILD) and run `makepkg`.
+If you use Arch, download the [PKGBUILD](https://raw.github.com/UncleNinja/sandvich/master/PKGBUILD) and run `makepkg`.
 
 config
 ------
