@@ -68,7 +68,7 @@ def build (where=None) :
 
         # initialize hook objects
         if cfg["hooks"] :
-            if cfg["hooksdir"] :
+            if "hooksdir" in cfg and cfg["hooksdir"] :
                 sys.path.insert(0, cfg["hooksdir"])
                 
             cfg["hookobjects"] = inithooks(cfg["hooks"])
