@@ -22,15 +22,15 @@ from templates import process
 
 defaults = {
     # sane data pool defaults
-    "src" : "src"+os.sep,
-    "dest" : "dest"+os.sep,
-    "newext" : ".html",
-    "template" : { "location" : "template.html" },
+    "template" : {},
     "hookobjects" : [],
     "pages" : [],
 
     # empty values to keep string concats from failing
+    "src" : "",
+    "dest" : "",
     "ext" : "",
+    "newext" : "",
     "templatedir" : "",
     "templateext" : "",
 }
