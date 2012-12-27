@@ -52,8 +52,6 @@ def build (d = {}) :
     defd.update(d)
     d = defd
 
-    print d["hookobjects"]
-
     # HOOK: start
     d = firehook(d, "start")
     
