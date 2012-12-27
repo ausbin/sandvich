@@ -3,7 +3,8 @@
 sandvich
 ========
 
-sandvich is a simple, extensible document generator based on a pool of data and a basic template processor.
+sandvich is a simple, extensible document generator based on a pool of data and
+a basic template processor.
 
     $ sandvich help
     usage: sandvich build [location]
@@ -11,19 +12,24 @@ sandvich is a simple, extensible document generator based on a pool of data and 
 installation
 ------------
 
-Dependencies: a recent version of [Python 2](http://www.python.org/) and [PyYAML](http://pyyaml.org/wiki/PyYAML) (for the default command-line interface).
+Dependencies: a recent version of [Python 2][] and [PyYAML][] (for the default
+command-line interface).
 
     $ git clone git://github.com/UncleNinja/sandvich.git sandvich
     $ cd sandvich
     # python2 setup.py install
     # install -Dm 755 bin/sandvich /usr/bin
 
-If you use Arch, download the [PKGBUILD](https://raw.github.com/UncleNinja/sandvich/master/PKGBUILD) and run `makepkg`. To use the command-line interface install `python2-yaml`.
+If you use Arch, download the [PKGBUILD][] and run `makepkg`. To use the
+command-line interface install the `python2-yaml` package in `[community]`.
 
 config
 ------
 
-As mentioned above, sandvich is based around a data pool. In the default interface this is initialized by a yaml file named `config.yml`. If you're not familiar with yaml, it might be helpful to familiarize yourself with it via [its website](http://yaml.org/) or the [wikipedia article](https://en.wikipedia.org/wiki/Yaml).
+As mentioned above, sandvich is based around a data pool. In the default
+interface this is initialized by a yaml file named `config.yml`. If you're not
+familiar with yaml, it might be helpful to familiarize yourself with it via
+[its website][yaml] or the [wikipedia article][yamlwp].
 
 Here's an example config file:
 
@@ -75,7 +81,8 @@ pigfoods:
 - pork rinds
 ```
 
-By the `final` hook, the data pool initialized by the above configuration would resemble this python dictionary:
+By the `final` hook, the data pool initialized by the above configuration would
+resemble this python dictionary:
 
 ```python
 {
@@ -92,6 +99,12 @@ By the `final` hook, the data pool initialized by the above configuration would 
     "templatedir" : "templates/",
     # appended to template["name"] to form the location if it wasn't specified (default: "")
     "templateext" : ".html",
+    # called by sandvich after the page and premerge hooks. arguments are a
+    # string holding the contents of the template and the contents of the data
+    # pool in the form of a dictionary (in that order). this defaults to
+    # `sandvich.templates.process`. To modify this, use a hook.
+    # `sandvich.hooks.JinjaTemplates` is a good example.
+    "templatecall" : sandvich.templates.process,
 
     # the template the pages will be processed with
     "template" : {
@@ -178,51 +191,92 @@ By the `final` hook, the data pool initialized by the above configuration would 
 templates
 ---------
 
-sandvich's template processor is extremely simple. It inserts values. If you're looking for more complex logic, try using hooks.
+sandvich's template processor is extremely simple. It inserts values. If you're
+looking for more complex logic, try using hooks.
 
-The most basic value substitution is `{ arandomvalue }`. Using the configuration example above this would end up as `8093`. 
+### using jinja templates
 
-If you'd like to seek a value in a dictionary, you can use the `:` operator: `{ fruitcolors : banana }` results in `yellow`. `:` calls `__getitem__` with the string you specified, so the last example would result in a call that looks like `d.__getitem__("fruitcolors").__getitem__("banana")` (`d` is the internal variable name for the data pool).
+[Jinja][] is a powerful templating language written in Python and styled after
+[Django][]'s templating libraries. As a result it has many features such as 
+inheritance, looping, and conditionals. If you're doing anything complicated, 
+give it a try.
 
-Trying to access an item in a list with the `:` operator will raise a `TypeError`. Why? Because the parameter to `__getitem__()` is a string! The solution is the `#` operator, which converts the value name to an integer before calling `__getitem__()`.
+sandvich has builtin support for jinja. Install jinja2 and add the following
+hook into `config.yml` to get started:
 
-For example, `{ pigfoods # 0 }` results in `bacon`. The cool part is that you can use other values such as `-1` because they're integers too. `{ pigfoods # -1 }` would end up as `pork rinds`.
+    hooks:
+    - sandvich.hooks.JinjaTemplates
 
-Attributes can be accessed with the `.` operator. `{ hookobjects # 1 . exampleattribute }` would become the value of `example.Example().exampleattribute`.  
+### builtin template processor syntax
 
-If the last value in a chain of values is `callable()`, it will be replaced with its return value. That means that before every `|` or `}` the current value will be called if it's callable. `{ hookobjects # 1 . examplemethod }` would result in the return value of `example.Example().examplemethod()`.
+The most basic value substitution is `{ arandomvalue }`. Using the config
+example above this would end up as `8093`. 
 
-The `|` operator can be used for basic logic. If the preceding value chain results in a value that is determined to be False by `bool()`, the next chain of values will be evaluated. For example, `{ fruitcolors : donkey | arandomvalue }` would result in `8093`. `fruitcolors["donkey"]` doesn't exist, so that value chain ends up evaluating to `False`, causing the value of `arandomvalue` will be inserted instead. 
+If you'd like to seek a value in a dictionary, you can use the `:` operator: 
+`{ fruitcolors : banana }` results in `yellow`. `:` calls `__getitem__` with
+the string you specified, so the last example would result in a call that looks
+like `d.__getitem__("fruitcolors").__getitem__("banana")` (`d` is the internal
+variable name for the data pool).
 
-If the final value is deemed `False` by `bool()` or accessing it raises an error, then it won't be inserted into the template. `that's the { bogus }th fish in my basement this week!`, for example, would end up as `that's the th fish in my basement this week!`.
+Trying to access an item in a list with the `:` operator will result in a blank
+subsitution because the parameter to `__getitem__()` is a string (raising a 
+`TypeError` that is caught by sandvich). The solution is the `#` option, which
+casts the value name it is placed in front of to an integer before calling
+`__getitem__()`. For example, `{ pigfoods : #0 }` results in `bacon`. 
+
+Attributes can be accessed with the `.` operator. The tag
+`{ hookobjects : #1 . exampleattribute }` would become the value of
+`example.Example().exampleattribute`.  
+
+If a value name is followed by a pair of parentheses (`()`), it will be
+replaced with its return value. For example,
+`{ hookobjects # 1 . examplemethod() }` would result in the return value of
+`example.Example().examplemethod()`.
+
+The `|` operator can be used for basic logic. If the preceding value chain
+results in a value that is determined to be `False` by `bool()`, the next chain
+of values will be evaluated. For example,
+`{ fruitcolors : donkey | arandomvalue }` would result in `8093`. 
+`fruitcolors["donkey"]` doesn't exist, so that value chain ends up evaluating
+to `False`, causing the value of `arandomvalue` to be inserted instead. 
+
+If the final value is deemed `False` by `bool()` or accessing it raises an 
+error, then it won't be inserted into the template. `that's the { bogus }th 
+fish in my basement this week!`, for example, would end up as `that's the th 
+fish in my basement this week!`.
 
 hooks
 -----
 
-Hooks are certain points in sandvich's build process in which the data pool can be is exposed and modified. 
+Hooks are certain points in sandvich's build process in which the data pool can
+be is exposed and modified. 
 
 Here's a list of the basic process of a build and when hooks are called:
 
-* *start* hook
-* *template* hook
+* **start** hook
+* **template** hook
 * template's location is determined and its content is loaded
-* *prepages* hook
+* **prepages** hook
 * loop through pages
     * the current page is loaded into `d["page"]`.
     * the page's location is determined and its content is loaded
-    * *page* hook
+    * **page** hook
     * the page's content is parsed for template tags
-    * *premerge* hook
+    * **premerge** hook
     * the page's content is replaced with the template's processed content
-    * *postmerge* hook
+    * **postmerge** hook
     * page's destination is determined and written
-    * *postpage* hook
-* *postpages* hook
-* *final* hook
+    * **postpage** hook
+* **postpages** hook
+* **final** hook
 
-Hooks are implemented using hook classes. Each hook is represented by a method. The first parameter is the data pool, a dictionary. Any modified version returned replaces the data pool entirely. Hook classes should always subclass `sandvich.hooks.Hook` to provide method stubs for hooks that aren't used. 
+Hooks are implemented using hook classes. Each hook is represented by a method.
+The first parameter is the data pool, a dictionary. Any modified version
+returned replaces the data pool entirely. Hook classes should always subclass
+`sandvich.hooks.Hook` to provide method stubs for hooks that aren't used. 
 
-Here's an example hook that replaces every occurance of "banana" in each page with "apple":
+Here's an example hook that replaces every occurance of "banana" in each page
+with "apple":
 
 ```python
 from sandvich.hooks import Hook
@@ -236,7 +290,11 @@ class Example (Hook) :
 
 For more a list of keys in the data pool, look at the [config section](#config).
 
-If you're using the command line interface, list the names of the hook classes in `config.yml` in the order in which you would like them to be executed. If their module are not located in `sys.path`, add their location to `hooksdir`. We'll assume that the above python code is located in `./hooks/mycustommodule.py`:
+If you're using the command line interface, list the names of the hook classes
+in `config.yml` in the order in which you would like them to be executed. If
+the module the hooks are contained in is not located in `sys.path`, add its
+location to `hooksdir`. We'll assume that the above python code is located in 
+`./hooks/mycustommodule.py`:
 
 ```yaml
 hooksdir: hooks
@@ -246,7 +304,8 @@ hooks:
 - mycustommodule.Example
 ```
 
-Those will be found and initialized by `__main__.inithooks()` and put into `d["hookobjects"]` like so:
+Those will be found and initialized by `__main__.inithooks()` and put into 
+`d["hookobjects"]` like so:
 
 ```python
 {
@@ -263,4 +322,14 @@ Those will be found and initialized by `__main__.inithooks()` and put into `d["h
     # ...
 }
 ```
-Note that `hooks` and `hooksdir` are ignored by `core.build`. `core.build` only cares about `hookobjects`, which is generated by `__main__.inithooks()`.
+
+Note that `hooks` and `hooksdir` are ignored by `core.build`. `core.build` only
+cares about `hookobjects`, which is generated by `__main__.inithooks()`.
+
+[yaml]:     http://yaml.org/ 
+[yamlwp]:   https://en.wikipedia.org/wiki/Yaml
+[PKGBUILD]: https://raw.github.com/UncleNinja/sandvich/master/PKGBUILD
+[Python 2]: http://python.org/
+[PyYaml]:   http://pyyaml.org/wiki/PyYAML
+[Jinja]:    http://jinja.pocoo.org/
+[Django]:   https://djangoproject.com/

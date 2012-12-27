@@ -19,6 +19,7 @@ class SandvichError (Exception) :
     desc = "general"
     exitcode = 1
 
+# mainly used in __main__
 class ArgError (SandvichError) :
     desc = "argument"
     exitcode = 2

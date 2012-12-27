@@ -18,10 +18,16 @@
 import os
 import sys
 import core
-import yaml
+from yaml import load
 from templates import process
 from collections import namedtuple
 from errors import SandvichError, DataPoolError, ArgError
+
+# prevents pyyaml-specific tags from being included in the document
+try :
+    from yaml import CSafeLoader as SafeLoader
+except ImportError :
+    from yaml import SafeLoader
 
 def inithooks (hooks) :
     hookobjects = [None] * len(hooks)
@@ -64,7 +70,7 @@ def build (where=None) :
     cfgfile = "config.yml"
 
     if os.path.isfile(cfgfile) :
-        cfg = yaml.load(open(cfgfile).read())
+        cfg = load(open(cfgfile).read(), SafeLoader)
 
         # initialize hook objects
         if cfg["hooks"] :

@@ -17,62 +17,65 @@
 
 import re
 
-valref = r"\s*(\w+(\s*[:\.#]\s*\w+)*)\s*"
+# XXX support basic looping and conditionals
+
+# this regex makes me want to stab my eye out with a pencil
+valref = r"\s*(#?\w+(\(\))?(\s*[:\.]\s*#?\w+(\(\))?)*)\s*"
 valregex = re.compile(r"\{(%(v)s(\s*\|%(v)s)*)\}" % {"v" : valref})
-splitregex = re.compile(r"(\w+|[\|\.:#])")
+splitregex = re.compile(r"((?P<opts>#)?(?P<name>\w+)(?P<func>\(\))?|[\|\.:#])")
 
 def valsub (match, data) :
     text = match.group(1)
     # it's the past tense form of split. 
-    splat = splitregex.findall(text)
+    splat = splitregex.finditer(text)
     mode = "getitem"
     parent = data
 
-    for i, token in enumerate(splat) :
+    for i, match in enumerate(splat) :
+        token = match.group(0)
+
         # if it's an operator
         if i % 2 :
             if token == ":" :
                 mode = "getitem"
-            elif token == "#" :
-                mode = "intgetitem"
             elif token == "." :
                 mode = "getattr"
             elif token == "|" :
-                # call the parent value if it's callable
-                if callable(parent) :
-                    parent = parent()
-
                 if parent :
                     break
                 else :
                     mode = "getitem"
                     parent = data
         else :
+            # if the last value in the chain is empty, then work our way
+            # down to the end (or a pipe)
             if not parent :
                 continue
 
-            if mode in ("getitem", "intgetitem") :
-                index = token
+            groups = match.groupdict()
+            opts = groups["opts"]
+            func = groups["func"]
+            name = groups["name"]
 
-                if mode == "intgetitem" :
-                    index = int(index)
+            if opts and "#" in opts :
+                name = int(name)
 
+            if mode == "getitem" :
                 try :
-                    val = parent[index]
+                    val = parent[name]
                 # XXX support more errors than just those for dicts and lists
                 except (IndexError, KeyError) :
                     val = None
             elif mode == "getattr" :
                 try :
-                    val = getattr(parent, token)
+                    val = getattr(parent, name)
                 except AttributeError :
                     val = None
 
+            if val and func :
+                val = val()
 
             parent = val
-
-    if callable(parent) :
-        parent = parent()
 
     result = str(parent) if parent else ""
 

@@ -23,6 +23,7 @@ from templates import process
 defaults = {
     # sane data pool defaults
     "template" : {},
+    "templatecall" : process,
     "hookobjects" : [],
     "pages" : [],
 
@@ -50,6 +51,8 @@ def build (d = {}) :
     defd = defaults.copy()
     defd.update(d)
     d = defd
+
+    print d["hookobjects"]
 
     # HOOK: start
     d = firehook(d, "start")
@@ -81,12 +84,12 @@ def build (d = {}) :
         d = firehook(d, "page")
 
         # process this page
-        d["page"]["content"] = process(d["page"]["content"], d)
+        d["page"]["content"] = d["templatecall"](d["page"]["content"], d)
 
         # HOOK: premerge
         d = firehook(d, "premerge")
 
-        d["page"]["content"] = process(d["template"]["content"], d)
+        d["page"]["content"] = d["templatecall"](d["template"]["content"], d)
 
         # HOOK: postmerge
         d = firehook(d, "postmerge")

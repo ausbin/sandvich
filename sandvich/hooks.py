@@ -15,21 +15,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import os
+from errors import SandvichError
 
-try :
-    import markdown
-except ImportError :
-    markdownsupport = False
-else :
-    markdownsupport = True
+# import modules as we need them (useful because jinja2, for example,
+# takes like half a second to load on my box)
+def tryimporting (module) :
+    if module not in globals() :
+        try :
+            globals()[module] = __import__(module)
+        except ImportError :
+            raise SandvichError("module %s is not installed")
 
 # subclass this and override functions to make your own hooks
 # d is a mixture of config and runtime variables
 class Hook (object) :
 
     # called just after hook objects are initialed from config
-    # (it's a good idea to use the config hook if you want to do something config-related)
     def start (self, d) :
         pass
     
@@ -73,10 +74,42 @@ class Hook (object) :
 
 ### example hooks ###
 
+class JinjaTemplates (Hook) :
+    def __init__ (self) :
+        tryimporting("jinja2")
+
+        # we shouldn't store the given template as a jinja2 Template object
+        # the next time templatecall() is called because all sandvich is doing
+        # is processing the tags of the page from disk
+        # we will cache the object, however, when we are given the text of the
+        # template (which is used more than once) after the premerge hook
+        self.merge = False    
+        self.jtemplate = None
+
+    def templatecall (self, content, d) :
+        if self.merge and self.jtemplate :
+            template = self.jtemplate
+        else :
+            template = jinja2.Template(content)
+
+            if self.merge :
+                self.jtemplate = template
+
+        return template.render(d)
+
+    def start (self, d) :
+        d["templatecall"] = self.templatecall
+        return d
+
+    def premerge (self, d) :
+        self.merge = True
+
+    def postmerge (self, d) :
+        self.merge = False
+
 class Markdown (Hook) :
     def __init__  (self) :
-        if not markdownsupport :
-            raise Exception("install python(2)-markdown to use the Markdown hook")
+        tryimporting("markdown")
 
     def page (self, d) :
         d["page"]["content"] = markdown.markdown(d["page"]["content"])
