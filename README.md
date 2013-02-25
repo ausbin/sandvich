@@ -20,7 +20,7 @@ command-line interface).
     # python2 setup.py install
     # install -Dm 755 bin/sandvich /usr/bin
 
-If you use Arch, download the [PKGBUILD][] and run `makepkg`. To use the
+If you use Arch, [download the PKGBUILD][PKGBUILD] and run `makepkg`. To use the
 command-line interface install the `python2-yaml` package in `[community]`.
 
 config
@@ -204,8 +204,10 @@ give it a try.
 sandvich has builtin support for jinja. Install jinja2 and add the following
 hook into `config.yml` to get started:
 
-    hooks:
-    - sandvich.hooks.JinjaTemplates
+```yaml
+hooks:
+- sandvich.hooks.JinjaTemplates
+```
 
 ### builtin template processor syntax
 
@@ -254,20 +256,20 @@ be is exposed and modified.
 Here's a list of the basic process of a build and when hooks are called:
 
 * **start** hook
-* **template** hook
-* template's location is determined and its content is loaded
-* **prepages** hook
-* loop through pages
-    * the current page is loaded into `d["page"]`.
-    * the page's location is determined and its content is loaded
-    * **page** hook
-    * the page's content is parsed for template tags
-    * **premerge** hook
-    * the page's content is replaced with the template's processed content
-    * **postmerge** hook
-    * page's destination is determined and written
-    * **postpage** hook
-* **postpages** hook
+    * **template** hook
+        * template's location is determined and its content is loaded
+    * **prepages** hook
+        * loop through pages
+            * the current page is loaded into `d["page"]`.
+            * the page's location is determined and its content is loaded
+            * **page** hook
+                * the page's content is parsed for template tags
+            * **premerge** hook
+                * the page's content is replaced with the template's processed content
+            * **postmerge** hook
+                * page's destination is determined and written
+            * **postpage** hook
+    * **postpages** hook
 * **final** hook
 
 Hooks are implemented using hook classes. Each hook is represented by a method.
@@ -288,7 +290,7 @@ class Example (Hook) :
         return d
 ```
 
-For more a list of keys in the data pool, look at the [config section](#config).
+A list of data pool keys can be found in the [config section](#config).
 
 If you're using the command line interface, list the names of the hook classes
 in `config.yml` in the order in which you would like them to be executed. If
