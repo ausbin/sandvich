@@ -4,7 +4,7 @@ pkgver=VERSION
 pkgrel=3
 pkgdesc="brutally simple document generation"
 arch=("any")
-url="https://github.com/UncleNinja/sandvich"
+url="https://github.com/ausbin/sandvich"
 license=('GPL')
 depends=("python2")
 makedepends=('git')
@@ -12,7 +12,7 @@ optdepends=("python2-yaml: for the command-line interface")
 provides=("python2-sandvich")
 options=(!emptydirs)
 
-_gitroot=git://github.com/UncleNinja/sandvich.git
+_gitroot=git://github.com/ausbin/sandvich.git
 _gitname=sandvich
 
 build() {
