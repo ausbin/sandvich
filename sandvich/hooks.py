@@ -112,6 +112,6 @@ class Markdown (Hook) :
         tryimporting("markdown")
 
     def page (self, d) :
-        d["page"]["content"] = markdown.markdown(d["page"]["content"])
+        d["page"]["content"] = markdown.markdown(d["page"]["content"], extensions=d.get('markdown-extensions', []))
 
         return d

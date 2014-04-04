@@ -53,6 +53,12 @@ hooks:
 # hook could be stored in hooks/example.py
 - example.Example
 
+# passed as the extensions= keyword argument to markdown.markdown()
+# by the builtin sandvich.hooks.Markdown hook (optional)
+# see https://pythonhosted.org/Markdown/extensions/index.html
+markdown-extensions:
+- toc
+
 pages: # should be provided, default is an empty list
 - name: bob
   title: a tomato # just an example, below line is valid too
@@ -123,6 +129,11 @@ resemble this python dictionary:
     "hooks" : [
         "sandvich.hooks.Markdown",
         "example.Example"
+    ],
+
+    # nothing has changed here
+    "markdown-extensions": [
+        "toc"
     ],
 
     # instances of the objects listed in hooks (also created by __main__ rather than core.build)
