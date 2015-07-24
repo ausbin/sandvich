@@ -43,6 +43,13 @@ class Hook (object) :
     # (for changing filenames or something)
     def prepages (self, d) :
         pass
+
+    # called for every page after its path is computed but *before* it's
+    # read from disk
+    # (useful for gracefully handling pages that don't exist in src but
+    #  are specified in config.yml)
+    def pageload (self, d) :
+        pass
     
     # called before loaded page begins processing/validation
     # (for changing page contents before processing)
@@ -55,7 +62,7 @@ class Hook (object) :
         pass
     
     # called after template has been processed for local vars
-    # (if you want to modify the finished template+page before it is written to the disk
+    # (if you want to modify the finished template+page before it is written to the disk)
     def postmerge (self, d) :
         pass
 

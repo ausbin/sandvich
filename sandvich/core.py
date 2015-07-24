@@ -70,12 +70,14 @@ def build (d = {}) :
 
     for p in d["pages"] :
         d["page"] = p
+        if "location" not in d["page"] :
+            d["page"]["location"]  = d["src"]+d["page"]["name"]+d["ext"]
+
+        # HOOK: pageload
+        d = firehook(d, "pageload")
+
         # XXX nextpage and lastpage?
-
         if "content" not in d["page"] :
-            if "location" not in d["page"] :
-                d["page"]["location"]  = d["src"]+d["page"]["name"]+d["ext"]
-
             d["page"]["content"] = open(d["page"]["location"]).read()
 
         # HOOK: page 

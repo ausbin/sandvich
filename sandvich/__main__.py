@@ -73,7 +73,7 @@ def build (where=None) :
         cfg = load(open(cfgfile).read(), SafeLoader)
 
         # initialize hook objects
-        if cfg["hooks"] :
+        if "hooks" in cfg :
             if "hooksdir" in cfg and cfg["hooksdir"] :
                 sys.path.insert(0, cfg["hooksdir"])
                 

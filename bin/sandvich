@@ -1,2 +1,2 @@
 #!/bin/sh
-exec env python2 -m sandvich $@
+exec python2 -m sandvich $@

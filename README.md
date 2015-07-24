@@ -272,7 +272,10 @@ Here's a list of the basic process of a build and when hooks are called:
     * **prepages** hook
         * loop through pages
             * the current page is loaded into `d["page"]`.
-            * the page's location is determined and its content is loaded
+            * the page's location is determined
+            * **pageload** hook
+                * if `d["page"]["content"]` doesn't exist, the page's content
+                  is loaded from `d["page"]["location"]`
             * **page** hook
                 * the page's content is parsed for template tags
             * **premerge** hook
